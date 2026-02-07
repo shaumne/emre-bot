@@ -1,0 +1,51 @@
+ags
+Get related tags (relationships) by tag id
+GET
+/
+tags
+/
+{id}
+/
+related-tags
+
+Try it
+Path Parameters
+​
+id
+integerrequired
+Query Parameters
+​
+omit_empty
+boolean
+​
+status
+enum<string>
+Available options: active, closed, all 
+Response
+200 - application/json
+Related tag relationships
+
+​
+id
+string
+​
+tagID
+integer | null
+​
+relatedTagID
+integer | null
+​
+rank
+integer | null
+
+curl --request GET \
+  --url https://gamma-api.polymarket.com/tags/{id}/related-tags
+
+  [
+  {
+    "id": "<string>",
+    "tagID": 123,
+    "relatedTagID": 123,
+    "rank": 123
+  }
+]

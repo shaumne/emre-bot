@@ -1,0 +1,47 @@
+Builder Profile & Keys
+Learn how to access your builder profile and obtain API credentials
+
+​
+Accessing Your Builder Profile
+You can access your builder profile settings in your Polymarket Profile when signed in.
+You can also navigate to your builder profile by:
+Clicking your profile image in the top right corner
+Selecting “Builders” from the dropdown menu
+​
+Builder Profile Settings
+Builder Settings Page
+In your builder profile settings, you can:
+​
+Customize Your Builder Identity
+Profile Picture: Upload a custom image that will represent you on the Builder Leaderboard
+Builder Name: Set or update the name that will be displayed publicly on the leaderboard
+Your builder profile and stats will be visible to the community on the Builder Leaderboard, where builders compete for grants based on their trading volume.
+​
+View Your Builder Information
+Builder Address: Your unique builder address used to identify your account
+Creation Date: When your builder account was created
+​
+Obtaining Builder API Keys
+Builder API keys are required to attribute customer orders to your builder account. These credentials allow you to sign orders and add authentication headers to CLOB requests.
+​
+Creating API Keys
+In the Builder Keys section of your profile, you can:
+View your existing API keys with their creation dates and status
+Click ”+ Create New” to generate a new API key
+Each API key includes:
+apiKey: Your builder API key identifier
+secret: Secret key for signing requests
+passphrase: Additional authentication passphrase
+Security Notice: Your Builder API keys must be kept secure and never exposed in client-side code. Store them as environment variables and use remote signing when possible.
+​
+Managing API Keys
+Multiple Keys: You can create multiple API keys for different environments (development, production, etc.)
+Active Status: Keys show an “ACTIVE” status when they’re operational
+​
+Using Your Builder Credentials
+Once you have your API keys, you can use them to attribute orders to your builder account. See the Order Attribution guide for detailed implementation instructions.
+​
+Next Steps
+Learn about Order Attribution to start attributing customer orders
+Set up a Builder Signing Server for secure remote signing
+Check your stats on the Builder Leaderboard

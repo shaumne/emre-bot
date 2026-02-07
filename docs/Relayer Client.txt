@@ -1,0 +1,361 @@
+Relayer Client
+Use Polymarket’s Polygon relayer to execute gasless transactions for your users
+
+​
+Overview
+The Polymarket Relayer Client allows builders to route on-chain transactions through Polymarket’s Polygon relayer infrastructure. This provides several key benefits:
+Gasless Transactions: Polymarket pays for all gas fees on your behalf
+Safe Wallet Deployment: Deploy Safe Wallets for your users and customers
+Token Approvals: Set allowances for trading tokens
+CTF Operations: Execute Conditional Token Framework (CTF) operations including:
+Splitting positions
+Merging positions
+Redeeming positions
+Converting positions
+​
+Installation
+
+TypeScript
+
+Python
+
+Copy
+
+Ask AI
+npm install @polymarket/builder-relayer-client
+# or
+pnpm install @polymarket/builder-relayer-client
+​
+Quick Start
+​
+Relayer URL
+The Polymarket relayer is publicly available at:
+
+Copy
+
+Ask AI
+https://relayer-v2.polymarket.com/
+​
+Basic Setup
+The relayer client is available for both TypeScript and Python:
+
+Ethers v5
+
+Viem
+
+Python
+
+Copy
+
+Ask AI
+import { ethers } from "ethers";
+import { RelayClient } from "@polymarket/builder-relayer-client";
+import { BuilderApiKeyCreds, BuilderConfig } from "@polymarket/builder-signing-sdk";
+
+const relayerUrl = process.env.POLYMARKET_RELAYER_URL;
+const chainId = 137; // Polygon mainnet
+
+// Create wallet
+const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
+const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+
+// Configure builder credentials
+const builderCreds: BuilderApiKeyCreds = {
+    key: process.env.BUILDER_API_KEY!,
+    secret: process.env.BUILDER_SECRET!,
+    passphrase: process.env.BUILDER_PASS_PHRASE!
+};
+
+const builderConfig = new BuilderConfig({
+    localBuilderCreds: builderCreds
+});
+
+// Initialize client
+const client = new RelayClient(relayerUrl, chainId, wallet, builderConfig);
+​
+Remote Signing
+For enhanced security, you can use remote signing to keep your builder credentials on a secure server:
+
+TypeScript
+
+Python
+
+Copy
+
+Ask AI
+import { BuilderConfig } from "@polymarket/builder-signing-sdk";
+
+const builderConfig = new BuilderConfig({
+    remoteBuilderConfig: {url: "http://localhost:3000/sign"}
+});
+
+const client = new RelayClient(relayerUrl, chainId, wallet, builderConfig);
+​
+Core Features
+​
+Deploying Safe Wallets
+Deploy a Safe wallet for your user with a single call. Polymarket pays the gas fees:
+
+TypeScript
+
+Python
+
+Copy
+
+Ask AI
+const response = await client.deploySafe();
+const result = await response.wait();
+
+if (result) {
+    console.log("Safe deployed successfully!");
+    console.log("Transaction Hash:", result.transactionHash);
+    console.log("Safe Address:", result.proxyAddress);
+} else {
+    console.log("Safe deployment failed");
+}
+​
+Setting Token Approvals
+Set token allowances to enable trading. This example approves USDC spending for the Conditional Token Framework:
+
+TypeScript
+
+Copy
+
+Ask AI
+import { ethers } from "ethers";
+import { Interface } from "ethers/lib/utils";
+import { OperationType, SafeTransaction } from "@polymarket/builder-relayer-client";
+
+// Define ERC20 approval interface
+const erc20Interface = new Interface([{
+    "constant": false,
+    "inputs": [
+        {"name": "_spender", "type": "address"},
+        {"name": "_value", "type": "uint256"}
+    ],
+    "name": "approve",
+    "outputs": [{"name": "", "type": "bool"}],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+}]);
+
+// Create approval transaction
+function createApprovalTransaction(
+    tokenAddress: string,
+    spenderAddress: string
+): SafeTransaction {
+    return {
+        to: tokenAddress,
+        operation: OperationType.Call,
+        data: erc20Interface.encodeFunctionData("approve", [
+            spenderAddress,
+            ethers.constants.MaxUint256
+        ]),
+        value: "0"
+    };
+}
+
+// Execute the approval
+const usdcAddress = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
+const ctfAddress = "0x4d97dcd97ec945f40cf65f87097ace5ea0476045";
+
+const approvalTx = createApprovalTransaction(usdcAddress, ctfAddress);
+const response = await client.executeSafeTransactions(
+    [approvalTx],
+    "Approve USDC for CTF"
+);
+
+const result = await response.wait();
+console.log("Approval completed:", result?.transactionHash);
+​
+Monitoring Transaction Status
+The relayer client provides built-in transaction monitoring:
+
+TypeScript
+
+Python
+
+Copy
+
+Ask AI
+// Automatic waiting (recommended)
+const response = await client.executeSafeTransactions(transactions);
+const result = await response.wait();
+
+if (result) {
+    console.log("Transaction confirmed:", result.transactionHash);
+    console.log("Transaction state:", result.state);
+} else {
+    console.log("Transaction failed or timed out");
+}
+​
+Transaction States
+Transactions move through the following states:
+STATE_NEW: Transaction received by relayer
+STATE_EXECUTED: Transaction executed on-chain
+STATE_MINED: Transaction included in a block
+STATE_CONFIRMED: Transaction confirmed (final state)
+STATE_FAILED: Transaction failed (terminal state)
+STATE_INVALID: Transaction rejected as invalid (terminal state)
+​
+CTF Operations
+The relayer client enables you to execute Conditional Token Framework operations for your users:
+​
+Split Positions
+Split collateral tokens into conditional tokens representing different outcomes:
+
+Copy
+
+Ask AI
+import { Interface } from "ethers/lib/utils";
+import { OperationType, SafeTransaction } from "@polymarket/builder-relayer-client";
+
+const ctfInterface = new Interface([
+    "function splitPosition(address collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] partition, uint amount)"
+]);
+
+const splitTx: SafeTransaction = {
+    to: ctfAddress,
+    operation: OperationType.Call,
+    data: ctfInterface.encodeFunctionData("splitPosition", [
+        collateralToken,
+        parentCollectionId,
+        conditionId,
+        partition,
+        amount
+    ]),
+    value: "0"
+};
+
+const response = await client.executeSafeTransactions([splitTx], "Split position");
+const result = await response.wait();
+​
+Merge Positions
+Merge conditional tokens back into collateral:
+
+Copy
+
+Ask AI
+const ctfInterface = new Interface([
+    "function mergePositions(address collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] partition, uint amount)"
+]);
+
+const mergeTx: SafeTransaction = {
+    to: ctfAddress,
+    operation: OperationType.Call,
+    data: ctfInterface.encodeFunctionData("mergePositions", [
+        collateralToken,
+        parentCollectionId,
+        conditionId,
+        partition,
+        amount
+    ]),
+    value: "0"
+};
+
+const response = await client.executeSafeTransactions([mergeTx], "Merge position");
+const result = await response.wait();
+​
+Redeem Positions
+Redeem winning conditional tokens for collateral after market resolution:
+
+Copy
+
+Ask AI
+const ctfInterface = new Interface([
+    "function redeemPositions(address collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] indexSets)"
+]);
+
+const redeemTx: SafeTransaction = {
+    to: ctfAddress,
+    operation: OperationType.Call,
+    data: ctfInterface.encodeFunctionData("redeemPositions", [
+        collateralToken,
+        parentCollectionId,
+        conditionId,
+        indexSets
+    ]),
+    value: "0"
+};
+
+const response = await client.executeSafeTransactions([redeemTx], "Redeem position");
+const result = await response.wait();
+​
+Transaction Metadata
+Use descriptive metadata to track transaction purposes:
+Metadata is limited to 500 characters or less
+
+Copy
+
+Ask AI
+await client.executeSafeTransactions(
+    transactions,
+    "User deposit: 100 USDC for market ABC123"
+);
+​
+TypeScript Types
+The relayer client is fully typed. Key types include:
+
+Copy
+
+Ask AI
+interface SafeTransaction {
+    to: string;
+    operation: OperationType;
+    data: string;
+    value: string;
+}
+
+enum OperationType {
+    Call = 0,
+    DelegateCall = 1
+}
+
+enum RelayerTransactionState {
+    STATE_NEW = "STATE_NEW",
+    STATE_EXECUTED = "STATE_EXECUTED",
+    STATE_MINED = "STATE_MINED",
+    STATE_CONFIRMED = "STATE_CONFIRMED",
+    STATE_FAILED = "STATE_FAILED",
+    STATE_INVALID = "STATE_INVALID"
+}
+
+interface RelayerTransaction {
+    transactionID: string;
+    transactionHash: string;
+    from: string;
+    to: string;
+    proxyAddress: string;
+    data: string;
+    state: string;
+    type: string;
+    metadata: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
+​
+Contract Addresses
+​
+Polygon Mainnet
+USDC: 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174
+CTF (Conditional Token Framework): 0x4d97dcd97ec945f40cf65f87097ace5ea0476045
+CTF Exchange: 0x4bFb41d5B3570DeFd03C39a9A4D8dE6Bd8B8982E
+Neg Risk CTF Exchange: 0xC5d563A36AE78145C45a50134d48A1215220f80a
+These addresses are commonly used for token approvals and CTF operations.
+​
+Resources
+​
+TypeScript
+Builder Relayer Client Repository
+Example Code
+​
+Python
+Python Builder Relayer Client Repository
+Example Code
+​
+Additional Resources
+Order Attribution Guide
+​
+Support
+If you encounter issues or have questions about using the relayer client, please contact support@polymarket.com.

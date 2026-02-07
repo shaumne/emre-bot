@@ -1,0 +1,15 @@
+Get Active Orders
+This endpoint requires a L2 Header.
+Get active order(s) for a specific market.
+HTTP REQUEST
+GET /<clob-endpoint>/data/orders
+​
+Request Parameters
+Name	Required	Type	Description
+id	no	string	id of order to get information about
+market	no	string	condition id of market
+asset_id	no	string	id of the asset/token
+​
+Response Format
+Name	Type	Description
+null	OpenOrder[]	list of open orders filtered by the query parameters

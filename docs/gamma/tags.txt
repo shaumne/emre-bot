@@ -1,0 +1,23 @@
+https://docs.polymarket.com/api-reference/tags/list-tags#response-items-is-carousel-one-of-0
+
+List tags
+
+curl --request GET \
+  --url https://gamma-api.polymarket.com/tags
+
+200
+[
+  {
+    "id": "<string>",
+    "label": "<string>",
+    "slug": "<string>",
+    "forceShow": true,
+    "publishedAt": "<string>",
+    "createdBy": 123,
+    "updatedBy": 123,
+    "createdAt": "2023-11-07T05:31:56Z",
+    "updatedAt": "2023-11-07T05:31:56Z",
+    "forceHide": true,
+    "isCarousel": true
+  }
+]

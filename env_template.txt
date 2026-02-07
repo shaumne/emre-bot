@@ -1,0 +1,156 @@
+# ============================================
+# POLYMARKET ARBITRAGE BOT CONFIGURATION
+# ============================================
+
+# ============================================
+# WALLET CONFIGURATION
+# ============================================
+# Your Polygon private key (NEVER commit this to git!)
+# Export from https://reveal.magic.link/polymarket (for email login)
+# or from your Web3 wallet (MetaMask, etc.)
+POLY_PRIVATE_KEY=your_private_key_here
+
+# Your Polymarket proxy address (BROWSER_ADDRESS - shown below your profile picture on Polymarket)
+# This is where you deposit USDC to fund your trading. REQUIRED for Email/Magic (POLY_PROXY) mode.
+POLY_PROXY_ADDRESS=your_proxy_address_here
+
+# Signature type based on your wallet:
+# 0 = EOA (if you trade directly from wallet)
+# 1 = Email/Magic account (recommended for most users)
+# 2 = Browser Wallet (MetaMask, Coinbase Wallet, etc.)
+POLY_SIGNATURE_TYPE=1
+
+# ============================================
+# TRADING PARAMETERS
+# ============================================
+# Trigger threshold: Execute arbitrage when YES + NO price sum < this value
+# Higher = more aggressive (catches more opportunities, but lower profit margins)
+# 0.98 = 2% safety margin (conservative)
+# 0.99 = 1% safety margin (moderate)
+# 1.0 = no safety margin (very aggressive - catches all opportunities)
+# Recommended for aggressive: 0.99 or 1.0
+TRIGGER_THRESHOLD=0.98
+
+# Fixed investment amount per arbitrage opportunity (in USDC)
+FIXED_INVESTMENT_AMOUNT=50.0
+
+# Minimum expected profit percentage to execute trade
+# Lower = more aggressive (catches more opportunities, but lower profit)
+# 0.02 = 2% minimum profit (conservative)
+# 0.01 = 1% minimum profit (moderate)
+# 0.005 = 0.5% minimum profit (aggressive)
+# 0.001 = 0.1% minimum profit (very aggressive)
+# Recommended for aggressive: 0.01 or 0.005
+MIN_PROFIT_THRESHOLD=0.02
+
+# Cooldown between opportunities for the same market (in seconds)
+# Lower = more aggressive (allows more frequent trades on same market)
+# 5.0 = 5 seconds (default)
+# 2.0 = 2 seconds (moderate)
+# 1.0 = 1 second (aggressive)
+# 0.0 = no cooldown (very aggressive)
+# Recommended for aggressive: 2.0 or 1.0
+OPPORTUNITY_COOLDOWN=5.0
+
+# Minimum USDC balance required to continue trading
+# Bot will pause if balance drops below this
+MIN_USDC_BALANCE=100.0
+
+# ============================================
+# MARKET SELECTION
+# ============================================
+# Market selection mode: "btc_eth" or "tags"
+MARKET_MODE=btc_eth
+
+# For btc_eth mode: Duration in minutes (opsiyonel - arama için kullanılır)
+# Polymarket'te 15dk marketler nadirdir, genellikle saatlik/günlük vardır
+# Bu değer sadece arama keyword'ü olarak kullanılır
+BTC_ETH_DURATION_MINUTES=15
+
+# For tags mode: Comma-separated list of tags to monitor (crypto, politics, sports, etc.)
+TARGET_TAGS=crypto,politics
+
+# Minimum 24h trading volume (in USDC) to consider a market
+MIN_MARKET_VOLUME=1000.0
+
+# Minimum liquidity required on each side of orderbook
+MIN_LIQUIDITY=500.0
+
+# ============================================
+# NETWORK ENDPOINTS
+# ============================================
+# Polygon RPC endpoint (you can use Alchemy, Infura, or public RPC)
+POLYGON_RPC_URL=https://polygon-rpc.com/
+
+# Polymarket CLOB API endpoint
+CLOB_API_URL=https://clob.polymarket.com
+
+# Gamma API endpoint (for market data)
+GAMMA_API_URL=https://gamma-api.polymarket.com
+
+# WebSocket endpoint for real-time market data
+WSS_URL=wss://ws-subscriptions-clob.polymarket.com/ws/
+
+# ============================================
+# RATE LIMITING
+# ============================================
+# Maximum API calls per minute (leave buffer below 100 limit)
+MAX_API_CALLS_PER_MINUTE=80
+
+# Maximum number of markets to monitor simultaneously via WebSocket
+MAX_WS_SUBSCRIPTIONS=50
+
+# ============================================
+# LOGGING
+# ============================================
+# Log level: DEBUG, INFO, WARNING, ERROR
+LOG_LEVEL=INFO
+
+# Log file path
+LOG_FILE=logs/arbitrage.log
+
+# ============================================
+# PAPER TRADING MODE
+# ============================================
+# Enable paper trading mode (simulates trades without real money)
+# Set to "true" to enable, "false" to disable
+# When enabled, all trades are simulated and saved to CSV file
+PAPER_TRADING_MODE=false
+
+# CSV file path to save paper trades
+# Default: paper_trades.csv (in project root)
+PAPER_TRADING_FILE=paper_trades.csv
+
+# ============================================
+# MARKET MAKER SETTINGS (Ayrı Bot)
+# ============================================
+# Market maker paper trading mode
+MM_PAPER_TRADING=true
+
+# Market maker paper trading file
+MM_PAPER_TRADING_FILE=mm_paper_trades.csv
+
+# Target spread (kar marjı)
+# 0.02 = 2 cent = %2 kar (conservative)
+# 0.015 = 1.5 cent (moderate)
+# 0.01 = 1 cent (aggressive)
+MM_TARGET_SPREAD=0.02
+
+# Skew factor (inventory hassasiyeti)
+# 0.0001 = Her token için 0.01 cent fiyat kayması (moderate)
+# 0.00005 = Daha az hassas (conservative)
+# 0.0002 = Daha hassas (aggressive)
+MM_SKEW_FACTOR=0.0001
+
+# Max inventory (maksimum pozisyon limiti)
+# 1000 = ±1000 token (moderate)
+# 500 = ±500 token (conservative)
+# 2000 = ±2000 token (aggressive)
+MM_MAX_INVENTORY=1000
+
+# Quote güncelleme sıklığı (saniye)
+# 5.0 = 5 saniyede bir (moderate)
+# 10.0 = 10 saniyede bir (conservative)
+# 2.0 = 2 saniyede bir (aggressive)
+MM_QUOTE_UPDATE_INTERVAL=5.0
+
